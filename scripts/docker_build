@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+image_version = "0.1"
+image_name = "gcr.io/symbiome/deploybot:#{image_version}"
+
+cmds = [
+  "docker build -t #{image_name} .",
+  "docker push #{image_name}",
+]
+
+cmds.each do |cmd|
+  puts "[script] #{cmd}"
+
+  system(cmd)
+end
