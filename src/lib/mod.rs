@@ -7,5 +7,6 @@ pub mod kube_files_apply;
 pub mod kube_files_rewriter;
 pub mod kube_resource;
 pub mod pki;
+pub mod runner;
 pub mod slack;
 pub mod watch;

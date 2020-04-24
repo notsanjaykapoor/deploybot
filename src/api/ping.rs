@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse};
 use serde::{Deserialize, Serialize};
+use slog::info;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PingResult {
@@ -8,9 +9,11 @@ pub struct PingResult {
 
 /// this handler uses json extractor
 pub async fn ping(
-    _logger: web::Data<slog::Logger>,
-    _sender: web::Data<crossbeam::Sender<String>>,
+    logger: web::Data<slog::Logger>,
+    _channel: web::Data<crossbeam::Sender<String>>,
 ) -> HttpResponse {
+    info!(logger, "ping_api_request");
+
     let result = PingResult {
         message: "pong".to_string()
     };

@@ -1,7 +1,44 @@
 #!/usr/bin/env ruby
 
-image_version = "0.1"
-image_name = "gcr.io/symbiome/deploybot:#{image_version}"
+require "optparse"
+require "ostruct"
+
+projects = {
+  "greatvet" => {
+    registry: "gcr.io/great-vet/deploybot"
+  },
+  "symbiome" => {
+    registry: "gcr.io/symbiome/deploybot"
+  },
+}
+options = OpenStruct.new(
+  project: nil,
+  version: nil,
+)
+
+parser = OptionParser.new do |opts|
+  opts.on("-p", "--project name", "project name, e.g. #{projects.keys.join(" | ")}") do |s|
+    options.project = s
+  end
+
+  opts.on("-v", "--version name", "image version, e.g. 0.1") do |s|
+    options.version = s
+  end
+
+  opts.on('-h', '--help', 'help') do
+    puts opts.to_s
+    exit
+  end
+end
+
+parser.parse!
+
+if options.project.nil? || options.version.nil?
+  parser.parse!(['cmd', '-h'])
+end
+
+registry = projects[options.project][:registry]
+image_name = "#{registry}:#{options.version}"
 
 cmds = [
   "docker build -t #{image_name} .",

@@ -2,18 +2,19 @@
 extern crate juniper;
 extern crate serde_json;
 extern crate signal_hook;
-extern crate tokio;
 
 use actix_web::{middleware, web, App, HttpServer};
-use crossbeam_channel::unbounded;
+use crossbeam_channel::{bounded, unbounded};
 use dotenv;
 use slog::*;
 use std::process;
 use std::sync::Mutex;
+use std::thread;
 
 use crate::api::deploys::deploys_create;
 use crate::api::ping::ping;
 use crate::handlers::register;
+use crate::lib::deploy::DeployThread;
 use crate::lib::slack::SlackThread;
 
 mod api;
@@ -32,28 +33,52 @@ async fn main() -> std::io::Result<()> {
 
     let listen_address = dotenv::var("LISTEN_ADDRESS").unwrap();  // e.g. 0.0.0.0:80
 
-    // app data logger
+    // create logger
     let logger = Logger::root(
         Mutex::new(slog_json::Json::default(std::io::stdout())).map(slog::Fuse),
         o!(),
     );
 
     // create channels for sending and receiving messages
-    let (sender, receiver) = unbounded::<String>();
+    let (deploy_sender, deploy_receiver) = bounded::<String>(1);
+    let (slack_sender, slack_receiver) = unbounded::<String>();
 
-    // app data objects
+    // create app data objects
     let app_logger = web::Data::new(logger.clone());
-    let app_sender = web::Data::new(sender.clone());
+    let app_channel = web::Data::new(deploy_sender.clone());
+
+    // create deploy thread
+    thread::spawn({
+        let deploy_channel = deploy_receiver.clone();
+        let slack_channel = slack_sender.clone();
+        let logger = logger.clone();
+
+        move || {
+            DeployThread::new(
+                deploy_channel,
+                slack_channel,
+                logger,
+            ).call();
+        }
+    });
 
     // create slack thread
-    tokio::spawn(async move {
-        SlackThread::new(receiver.clone(), logger.clone()).call().await;
+    thread::spawn({
+        let slack_channel = slack_receiver.clone();
+        let logger = logger.clone();
+
+        move || {
+            SlackThread::new(
+                slack_channel,
+                logger,
+            ).call();
+        }
     });
 
     HttpServer::new(move || {
         App::new()
             .app_data(app_logger.clone())
-            .app_data(app_sender.clone())
+            .app_data(app_channel.clone())
             .data(web::JsonConfig::default().limit(4096))
             .configure(register)
             .wrap(middleware::Logger::default())

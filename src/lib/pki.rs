@@ -21,6 +21,18 @@ impl PkiCheck {
 
     pub fn call(&self, plaintext_message: &str, crypto_signature: &str, logger: &slog::Logger) -> std::io::Result<()> {
         let pki_dir = dotenv::var("PKI_DIR_ANY").unwrap();
+        let pki_check = dotenv::var("PKI_CHECK").unwrap_or("1".to_string());
+
+        match pki_check {
+            _ if pki_check == "0" => {
+                info!(logger, "pki_check_ignore"; "id" => &self.id);
+
+                return Ok(())
+            },
+            _ => {}
+        };
+
+        // pki_check is required
 
         for entry in fs::read_dir(pki_dir)? {
             let dir = entry?;

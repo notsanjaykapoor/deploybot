@@ -1,6 +1,6 @@
 [package]
 name = "deploybot"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Sanjay Kapoor <sanjay@jarna.com>"]
 edition = "2018"
 
@@ -13,18 +13,16 @@ debug = true
 [dependencies]
 actix-web = "2.0.0"
 actix-rt = "1.0.0"
-async-std="1.5.0"
 base64 = "0.12.0"
 crossbeam = "0.7.3"
 crossbeam-channel = "0.4.2"
 dotenv = "0.15.0"
 env_logger = "0.6.2"
 git2 = "0.13"
-hyper = "0.13"
-hyper-tls="0.4.1"
 juniper = "0.13"
 log = "0.4"
 openssl = "0.10"
+reqwest = { version = "0.10", features = ["blocking", "json"] }
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
@@ -32,6 +30,5 @@ signal-hook = "0.1"
 slog = "2.5.2"
 slog-json = "2.3.0"
 slog-term = "2.5.0"
-tokio = { version = "0.2", features = ["full"] }
 toml = "0.5.6"
 ulid = "0.3.1"

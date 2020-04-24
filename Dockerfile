@@ -9,9 +9,7 @@ RUN apt-get update && apt-get install -y apt-utils busybox curl docker.io git su
 
 WORKDIR /usr/local/src
 
-RUN mkdir -p /usr/local/src/pki/any
 COPY --from=app /usr/local/cargo/bin/deploybot /usr/local/bin/deploybot
-COPY --from=app /usr/local/src/config/pki/any /usr/local/src/pki/any
 
 # Install google cloud SDK
 # resource: https://stackoverflow.com/questions/43571787/docker-not-found-with-dockerdind-google-cloud-sdk

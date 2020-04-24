@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo "# check if pem key is valid:"
+echo "openssl rsa -noout -text -inform PEM -pubin -in <pem_file>"
+echo ""
+
+# example tar command
+echo "# create pki file with public keys in pem format:"
+echo "tar -cv config/pki/any/* | base64 > deploybot_pki_any.txt"
+echo ""

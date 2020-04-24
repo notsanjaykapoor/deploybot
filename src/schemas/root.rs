@@ -1,10 +1,6 @@
 use juniper::{FieldError, FieldResult, RootNode};
-// use slog::*;
-// use std::sync::Mutex;
-// use std::thread;
 use ulid::Ulid;
 
-// use crate::lib::deploy::DeployStage;
 use crate::schemas::deploy::DeployResult;
 use crate::schemas::ping::Ping;
 
@@ -22,34 +18,11 @@ impl QueryRoot {
     fn deploy_stage(context: &Context, repo: String, tag: String, path: String) -> FieldResult<DeployResult> {
         let id = Ulid::new().to_string();
 
-        // let logger = Logger::root(
-        //     Mutex::new(slog_json::Json::default(std::io::stdout())).map(slog::Fuse),
-        //     o!(),
-        // );
-        //
-        // thread::spawn({
-        //     let id = id.clone();
-        //     let logger = logger.clone();
-        //     let sender = None;
-        //
-        //     move || {
-        //         let code = match DeployStage::new(id, repo, tag, path, logger, sender).call() {
-        //             Some(code) => {
-        //                 code
-        //             },
-        //             None => {
-        //                 500
-        //             }
-        //         };
-        //     }
-        // });
-
         Ok(DeployResult {
             code: 202,
             id: id,
         })
     }
-
 
     #[graphql(description = "gql error", name = "error")]
     fn error(context: &Context) -> FieldResult<Ping> {
