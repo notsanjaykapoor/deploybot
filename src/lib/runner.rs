@@ -188,7 +188,7 @@ impl StageRunner {
             }
         };
 
-        info!(self.logger, "deploy_completed"; "id" => &self.id);
+        info!(self.logger, "deploy_completed"; "sha" => &self.sha, "path" => &self.path, "id" => &self.id);
 
         Some(0)
     }
