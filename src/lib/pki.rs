@@ -1,4 +1,5 @@
 
+use base64::Engine;
 use openssl::hash::MessageDigest;
 use openssl::pkey::{PKey, Public};
 use openssl::rsa::{Rsa};
@@ -93,7 +94,7 @@ impl PkiRead {
         verifier.update(&plaintext_message.as_bytes()).unwrap();
 
         // base64 decode crypto_signature
-        let crypto_signature_decoded = match base64::decode(crypto_signature) {
+        let crypto_signature_decoded = match base64::prelude::BASE64_STANDARD.decode(crypto_signature) {
             Err(_) => {
                 return None
             },

@@ -1,5 +1,3 @@
-use crate::schemas::root::Context;
-
 use serde::Serialize;
 
 #[derive(Default, Debug, Serialize)]
@@ -8,13 +6,13 @@ pub struct DeployResult {
     pub id: String,
 }
 
-#[juniper::object(Context = Context)]
+#[juniper::graphql_object]
 impl DeployResult {
-    fn code(&self, context: &Context) -> i32 {
+    fn code(&self) -> i32 {
         self.code
     }
 
-    fn id(&self, context: &Context) -> &str {
+    fn id(&self) -> &str {
         &self.id
     }
 }

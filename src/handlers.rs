@@ -1,40 +1,28 @@
-use std::sync::Arc;
-
-use actix_web::{web, Error, HttpResponse};
+use actix_web;
 use juniper::http::graphiql::graphiql_source;
 use juniper::http::GraphQLRequest;
 
-use crate::schemas::root::{create_schema, Context, Schema};
+use crate::schemas::root::{create_schema, Schema};
 
+#[actix_web::route("/graphql", method = "GET", method = "POST")]
 pub async fn graphql(
-    schema: web::Data<Arc<Schema>>,
-    data: web::Json<GraphQLRequest>,
-) -> Result<HttpResponse, Error> {
-    let ctx = Context {
-        name: "test".to_string(),
-    };
-    let res = web::block(move || {
-        let res = data.execute(&schema, &ctx);
-        Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
-    })
-    .await
-    .map_err(Error::from)?;
+    schema: actix_web::web::Data<Schema>,
+    data: actix_web::web::Json<GraphQLRequest>,
+) -> Result<actix_web::HttpResponse, actix_web::Error> {
+    let res = data.execute(&schema, &()).await;
 
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(res))
+    Ok(actix_web::HttpResponse::Ok().json(res))
 }
 
-pub async fn graphql_playground() -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(graphiql_source("/graphql"))
+/// GraphiQL UI
+#[actix_web::get("/graphiql")]
+async fn graphql_playground() -> impl actix_web::Responder {
+    actix_web::web::Html::new(graphiql_source("/graphql", None))
 }
 
-pub fn register(config: &mut web::ServiceConfig) {
-    let schema = std::sync::Arc::new(create_schema());
+pub fn register(config: &mut actix_web::web::ServiceConfig) {
     config
-        .data(schema)
-        .route("/graphql", web::post().to(graphql))
-        .route("/graphiql", web::get().to(graphql_playground));
+        .app_data(actix_web::web::Data::new(create_schema()))
+        .service(graphql)
+        .service(graphql_playground);
 }

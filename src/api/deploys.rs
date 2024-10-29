@@ -22,7 +22,7 @@ pub struct DeployResult {
 /// this handler uses json extractor
 pub async fn deploys_create(
     logger: web::Data<slog::Logger>,
-    channel: web::Data<crossbeam::Sender<String>>,
+    channel: web::Data<crossbeam_channel::Sender<String>>,
     item: web::Json<DeployStruct>,
 ) -> HttpResponse {
 

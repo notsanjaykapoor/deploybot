@@ -30,7 +30,7 @@ pub struct SlackMessage {
 
 #[derive(Debug)]
 pub struct SlackThread {
-    channel: crossbeam::Receiver<String>,
+    channel: crossbeam_channel::Receiver<String>,
     logger: slog::Logger,
 }
 
@@ -99,7 +99,7 @@ impl SlackChatPost {
 }
 
 impl SlackChatPublish {
-    pub fn call(sender: &crossbeam::Sender<String>, message: &SlackMessage) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn call(sender: &crossbeam_channel::Sender<String>, message: &SlackMessage) -> Result<(), Box<dyn std::error::Error>> {
         let j = serde_json::to_string(&message).unwrap();
 
         sender.send(j).unwrap();
@@ -110,7 +110,7 @@ impl SlackChatPublish {
 
 impl SlackThread {
 
-    pub fn new(channel: crossbeam::Receiver<String>, logger: slog::Logger) -> SlackThread {
+    pub fn new(channel: crossbeam_channel::Receiver<String>, logger: slog::Logger) -> SlackThread {
         SlackThread {
             channel: channel,
             logger: logger,

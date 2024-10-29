@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     // register sigint handler
-    let _signal = unsafe { signal_hook::register(signal_hook::SIGINT, || process::abort()) }?;
+    let _signal = unsafe { signal_hook::low_level::register(signal_hook::consts::SIGINT, || process::abort()) }?;
 
     let listen_address = dotenv::var("LISTEN_ADDRESS").unwrap();  // e.g. 0.0.0.0:80
 
@@ -79,7 +79,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(app_logger.clone())
             .app_data(app_channel.clone())
-            .data(web::JsonConfig::default().limit(4096))
+            .app_data(web::JsonConfig::default().limit(4096))
             .configure(register)
             .wrap(middleware::Logger::default())
             // register handlers

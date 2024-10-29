@@ -15,14 +15,14 @@ pub struct DeployMessage {
 
 #[derive(Debug)]
 pub struct DeployThread {
-    pub deploy_channel: crossbeam::Receiver<String>,  // receiver channel
-    pub slack_channel: crossbeam::Sender<String>,  // slack channel
+    pub deploy_channel: crossbeam_channel::Receiver<String>,  // receiver channel
+    pub slack_channel: crossbeam_channel::Sender<String>,  // slack channel
     pub logger: slog::Logger,
 }
 
 impl DeployThread {
 
-    pub fn new(deploy_channel: crossbeam::Receiver<String>, slack_channel: crossbeam::Sender<String>, logger: slog::Logger) -> DeployThread {
+    pub fn new(deploy_channel: crossbeam_channel::Receiver<String>, slack_channel: crossbeam_channel::Sender<String>, logger: slog::Logger) -> DeployThread {
         DeployThread {
             deploy_channel: deploy_channel,
             slack_channel: slack_channel,

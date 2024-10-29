@@ -1,21 +1,15 @@
-use juniper::{FieldError, FieldResult, RootNode};
+use juniper::{EmptySubscription, FieldError, FieldResult};
 use ulid::Ulid;
 
 use crate::schemas::deploy::DeployResult;
 use crate::schemas::ping::Ping;
 
-pub struct Context {
-    pub name: String,  // store anything in context for now
-}
-
-impl juniper::Context for Context {}
-
 pub struct QueryRoot;
 
-#[juniper::object(Context = Context)]
+#[juniper::graphql_object]
 impl QueryRoot {
     #[graphql(description = "deploy stage", name = "deploy_stage")]
-    fn deploy_stage(context: &Context, repo: String, tag: String, path: String) -> FieldResult<DeployResult> {
+    fn deploy_stage(_repo: String, _tag: String, _path: String) -> FieldResult<DeployResult> {
         let id = Ulid::new().to_string();
 
         Ok(DeployResult {
@@ -25,7 +19,7 @@ impl QueryRoot {
     }
 
     #[graphql(description = "gql error", name = "error")]
-    fn error(context: &Context) -> FieldResult<Ping> {
+    fn error() -> FieldResult<Ping> {
         Err(FieldError::new(
             "gql error",
             graphql_value!({ "not_found": "gql error" })
@@ -33,18 +27,27 @@ impl QueryRoot {
     }
 
     #[graphql(description = "ping")]
-    fn ping(context: &Context, message: String) -> FieldResult<Ping> {
+    fn ping(message: String) -> FieldResult<Ping> {
         Ok(Ping{ message: message })
     }
 }
 
 pub struct MutationRoot;
 
-#[juniper::object(Context = Context)]
-impl MutationRoot {}
+#[juniper::graphql_object]
+impl MutationRoot {
+    fn ping() -> FieldResult<DeployResult> {
+        let id = Ulid::new().to_string();
 
-pub type Schema = RootNode<'static, QueryRoot, MutationRoot>;
+        Ok(DeployResult {
+            code: 202,
+            id: id,
+        })
+    }
+}
+
+pub type Schema = juniper::RootNode<'static, QueryRoot, MutationRoot, EmptySubscription>;
 
 pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot, MutationRoot)
+    Schema::new(QueryRoot, MutationRoot, EmptySubscription::new())
 }

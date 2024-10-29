@@ -15,12 +15,12 @@ pub struct StageRunner {
     pub sha: String,
     pub path: String,
     pub logger: slog::Logger,
-    pub slack_channel: crossbeam::Sender<String>,
+    pub slack_channel: crossbeam_channel::Sender<String>,
 }
 
 impl StageRunner {
 
-    pub fn new(id: String, repo: String, tag: String, path: String, logger: slog::Logger, slack_channel: crossbeam::Sender<String>) -> StageRunner {
+    pub fn new(id: String, repo: String, tag: String, path: String, logger: slog::Logger, slack_channel: crossbeam_channel::Sender<String>) -> StageRunner {
         StageRunner {
             id: id,
             repo: repo,

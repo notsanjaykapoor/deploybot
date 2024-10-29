@@ -1,13 +1,11 @@
-use crate::schemas::root::Context;
-
 #[derive(Default, Debug)]
 pub struct Ping {
     pub message: String,
 }
 
-#[juniper::object(Context = Context)]
+#[juniper::graphql_object]
 impl Ping {
-    fn message(&self, context: &Context) -> &str {
+    fn message(&self) -> &str {
         &self.message
     }
 }

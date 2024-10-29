@@ -73,11 +73,12 @@ impl GitStage {
             false,
         );
 
-        let obj = repo.revparse_single(&("refs/heads/".to_owned() + &self.sha)).unwrap();
+        let head_sha = format!("refs/heads/{}", self.sha);
+        let obj = repo.revparse_single(&head_sha).unwrap();
 
         repo.checkout_tree(&obj, None)?;
 
-        repo.set_head(&("refs/heads/".to_owned() + &self.sha))?;
+        repo.set_head(&head_sha)?;
 
         Ok(())
     }

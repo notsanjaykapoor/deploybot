@@ -10,7 +10,7 @@ pub struct PingResult {
 /// this handler uses json extractor
 pub async fn ping(
     logger: web::Data<slog::Logger>,
-    _channel: web::Data<crossbeam::Sender<String>>,
+    _channel: web::Data<crossbeam_channel::Sender<String>>,
 ) -> HttpResponse {
     info!(logger, "ping_api_request");
 
